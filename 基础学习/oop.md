@@ -83,3 +83,6 @@ int main(){
 * 首先需要在类中声明 	friend Time operator*(type &x,type &y)
 * 在类中声明但是不是成员函数，不能用类来调用。
 定义函数过程不需要加类修饰符 Time opreator*(...){}
+
+### 运算符重载的另一个示例
+
