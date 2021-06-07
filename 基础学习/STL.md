@@ -506,3 +506,153 @@ set<int,MyCompare> s2;
 }
 ```
 
+#### map/multimap
+
+map中所有元素都是key，value形式，形如python中的字典。
+
+所有元素都会根据元素的key自动排序，他们都属于关联式容器，底层是二叉树
+
+* 优点：可以根据key快速找到value
+
+他们之间的区别：
+
+* map不允许容器中有重复的key值元素
+* multimap允许容器中有重复key值元素
+
+```c++
+构造和赋值：
+map<T1,T2> mp;默认构造函数
+map(const map &mp);拷贝构造函数
+
+map& operator=(const map &map);重载等号操作符
+大小与交换：
+size()容器中元素数目
+empty()判断容器是否为空
+swap()交换两个集合容器
+
+map插入和删除
+insert(elem)插入元素 
+clear()删除所有元素
+erase(pos)删除pos迭代器所指的元素，返回下一个元素迭代器位置
+erase(beg,end)删除区间[beg,end)所有元素，返回下一个元素的迭代器
+erase(key)删除容器中为key的元素
+
+map查找和统计
+find(key)查找key是否存在，若存在返回该key元素的迭代器；若不存在，返回set.end
+count(key)统计key的元素个数
+
+map容器排序
+map容器默认排序规则按照key值排序，从小到大，可以利用仿函数可以改变排序规则
+利用仿函数改变排序规则
+
+
+#include<iostream>
+#include<map>
+using namespace std;
+class Mycompare {
+public:
+	bool operator()(int v1, int v2)const {
+		return v1 > v2;
+	}
+};
+void tet01() {
+	map<int, int, Mycompare>m;
+	m.insert(make_pair(1,50));
+	m.insert(make_pair(2, 20));
+	m.insert(make_pair(3, 30));
+	m.insert(make_pair(4, 40));
+	m.insert(make_pair(5, 50));
+	for (map<int, int, Mycompare>::iterator it = m.begin(); it != m.end(); it++) {
+		cout << "key:" << it->first << " value:" << it->second << endl;
+	}
+}
+int main() {
+	tet01(); 
+	system("pause"); 
+	return 0;
+}
+```
+
+
+
+### 常用算法
+
+#### 遍历
+
+```
+for_each(iterator beg,iterator end,_func);遍历容器_func函数或函数对象
+transform(iterator beg,iterator end,iterator beg1,_func)搬运容器到另一个容器中
+beg1为目标容器的开始迭代器，_func函数或者函数对象
+```
+
+#### 查找
+
+```
+find(iterator beg,iterator end,value)value查找的元素
+返回的是迭代器类型
+find_if(iterator beg,iterator end,_Pred);
+按值查找，_Pred函数或者谓词（返回bool类型的仿函数）,按条件查找更加灵活，提供的防函数可以改变不同的策略
+
+adjacent_find(iterator beg,iterator end);
+查找相邻重复元素，返回相邻元素的第一个位置的迭代器
+beg开始迭代器，end结束迭代器
+
+bool binary_search(iterator beg,iterator,end,value)
+//查找指定的元素，查到返回true，否则false，！！！在无序序列中不可用
+
+count(iterator beg,iterator end,value)
+统计元素出现个数
+count_if(iterator beg, iterator end, _Pred);同样_Pred谓词
+```
+
+#### 排序
+
+```
+sort(iterator beg,iterator end,_Pred);默认从小到大排序
+sort(beg,end,greater<int>()); 从大到小的顺序排序
+
+
+random_shuffle(beg,end)//重新洗牌，打乱顺序.
+
+merge(beg1,end1,beg2,end2,iterator dest)
+// beg1 容器1开始迭代器 // end1 容器1结束迭代器 // beg2 容器2开始迭代器 // end2 容器2结束迭代器 // dest 目标容器开始迭代器
+
+reverse(iterator beg,iterator end);反转
+```
+
+#### 复制和替换算法
+
+```
+copy(beg,end,dest)dest为目标容器的开始
+replace(iterator beg, iterator end, oldvalue, newvalue)
+replace_if(iterator beg, iterator end, _pred, newvalue)
+swap(container c1, container c2);交换连个容器的元素
+```
+
+#### 算数生成算法
+
+```
+头文件#include <numeric>
+accumulate(iterator beg, iterator end, value);计算容器元素累计总和，value为起始值
+
+fill(iterator beg,iterator end,value);像容器中填充元素，beg开始迭代器，end结束迭代器
+value填充的值
+```
+
+#### 常用的集合算法
+
+```
+头文件#include <algorithm>
+
+
+set_intersection(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest);
+求两个集合的交集，两个集合必须是有序序列，dest目标容器开始迭代器
+目标容器开辟的空间需要从两个容器中取小的值，返回值是交集中最后一个元素的位置
+
+set_union(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest);两个集合的并集，返回值是并集中最后一个元素的位置
+
+set_difference(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest);求两个几个的差集，必须是有序序列，开辟的空间从两个容器取较大值
+```
+
+
+
