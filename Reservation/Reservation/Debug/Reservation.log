@@ -1,0 +1,5 @@
+﻿  teacher.cpp
+E:\C++_project\Reservation\Reservation\teacher.cpp(95,29): warning C4018: “<=”: 有符号/无符号不匹配
+E:\C++_project\Reservation\Reservation\teacher.cpp(105,46): warning C4834: 放弃具有 "nodiscard" 属性的函数的返回值
+E:\C++_project\Reservation\Reservation\teacher.cpp(108,46): warning C4834: 放弃具有 "nodiscard" 属性的函数的返回值
+  Reservation.vcxproj -> E:\C++_project\Reservation\Debug\Reservation.exe
