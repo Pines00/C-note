@@ -58,3 +58,97 @@
      * 以祖父节点为支点进行右旋
 
    总之思想就是将红色节点移到根节点；然后将根节点设为黑色。
+
+
+
+#### R_-Btree的节点设计
+
+红黑树有红黑两色，并且拥有左右子节点。此外还安排一个父节点（因为经常上溯父节点）
+
+```
+typedef  bool _rb_tree_color_type;
+const _rb_tree_color_type _rb_tree_red =false;//红色为0
+const _rb_tree_color_type _rb_tree_black=true;//黑色为1
+
+struct _rb_tree_node_base{
+	typedef _rb_tree_color_type color_type;
+	typedef _rb_tree_node_base* base_ptr;
+	color_type color;//节点颜色。非红即黑
+	base_ptr parent;
+	base_ptr left;
+	base_ptr right;
+	
+	static base_ptr minimum(base_ptr x){//一直向左走，就会找到最小值，这就是二叉搜索树的特性
+		while(x->left!=0)x=x->left;
+		return x;
+	}
+	
+	static base_ptr maximum(base_ptr x){
+		while(x->right!=0)x=x->right;
+		return x;
+}
+}
+template <class Value>
+struct _rb_tree_node:public _rb_tree_node_base{
+	typedef _rb_tree_node<Value>* link_type;//下一个节点
+	Value value_field;//节点值
+}
+```
+
+#### RB—tree的迭代器
+
+RB-tree迭代器实现为两层。_ rb_tree_node 继承自_rb_tree_node_base. _ rb_tree_iterator 继承自 _rb_tree_base_iterator.
+
+![image-20211202143524361](C:\Users\mzx\AppData\Roaming\Typora\typora-user-images\image-20211202143524361.png)
+
+这个图，_rb_tree_base_iterator中包含一个指向 _rb_tree_node_base的节点，一个自加，一个自减。然后下面 _rb_tree_iterator继承 _rb_tree_base_iterator。并且 _rb_tree_node继承 _rb_tree_node_base。这样他们四个关系就很清晰了。
+
+RB-tree迭代器属于双向迭代器，但不具备随机定位能力。迭代器的前进操作operator++()调用了其父类的increment()，后退操作operator--()调用了父类迭代器decrement()。
+
+```
+基层迭代器
+struct _rb_tree_base_iterator{
+	typedef _rb_tree_node_base::base_ptr  base_ptr;
+	typedef bidirectional_iterator_tag iterator_category;
+	typedef ptrdiff_t difference_type;
+	base_ptr node;//这个用来与容器之间产生一个连结关系；
+	
+	void increment(){}//这里就不去实现他
+	void decrement(){}//这是迭代器递减操作，具体不实现
+};
+
+真正的迭代器
+template<class Value,class Ref,class Ptr>
+struct _rb_tree_iterator:public _rb_tree_base_iterator{
+	typedef Value value_type;
+	typedef Ref reference;
+	typedef Ptr pointer;
+	typdef _rb_tree_iterator<Value,Value&,Value*> iterator;
+	typdef _rb_tree_iterator<Value,const Value&,const Value*> const_iterator;
+	typdef _rb_tree_iterator<Value,Ref,Ptr>  self;
+	typedef _rb_tree_node<Value>*  link_type;
+	
+	_rb_tree_iterator(){}
+	_rb_tree_iterator(link_type x){node=x;}
+	_rb_tree_iterator(const iterator& it){node=it.node;}
+	
+	reference operator*()const {return link_type(node)->value_field;}
+	pointer operator->()const {return &(operator*());}
+	
+	self& operator++(){increment();return *this}
+	self operator++(int){
+		self tmp=*this;
+		increment();
+		return tmp;
+	}
+	self& opeartor--(){decrement();return *this;}
+	self operator--(int){
+		self tmp=*this;
+		decrement();
+		return tmp;
+	}
+}
+```
+
+#### RB-tree的数据结构
+
